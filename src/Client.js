@@ -1,7 +1,7 @@
 const { Client, Intents, Collection } = require('discord.js')
-
-const fs = require('fs')
-const path = require('path')
+const { Manager } = require('erela.js')
+const mongodb = require('mongodb')
+const Loader = require('./Functions/Loader')
 
 const clientOptions = {
     intents: [
@@ -14,30 +14,32 @@ const clientOptions = {
 module.exports = class BeatzClient extends Client {
     constructor() {
         super(clientOptions)
+        //functions
+        this.loader = new Loader(this)
+
         this.aliases = new Collection()
         this.commands = new Collection()
-        this.events = new Collection()
-        this.modules = new Collection()
-    }
 
-    loadEvents = async (dir) => {
-        const filePath = path.join(__dirname, dir)
-        const files = await fs.readdirSync(filePath)
-        files.forEach(async eventFile => {
-            const stat = await fs.lstatSync(path.join(filePath, eventFile))
-            if (stat.isDirectory()) registerEvents(path.join(dir, eventFile))
-            if (eventFile.endsWith('.js')) {
-                const { name } = path.parse(eventFile)
-                const Event = require(path.join(filePath, eventFile))
-                const event = new Event(this, name)
-                this.events.set(event.name, event)
-                event.emitter[event.type](name, (...args) => event.run(...args))
+        this.prefix = '.'
+
+        this.music = new Manager({
+            nodes: [
+                {
+                  host: "localhost",
+                  password: "youshallnotpass",
+                  port: 2333,
+                }
+              ],
+            send: (id, payload) => {
+                const guild = this.client.guilds.cache.get(id);
+                // NOTE: FOR ERIS YOU NEED JSON.stringify() THE PAYLOAD
+                if (guild) guild.shard.send(payload)
             }
-        })
+        }) 
     }
 
     initialize = (token) => {
         super.login(token)
-        this.loadEvents('/Events')
+        this.loader.init()
     }
 }

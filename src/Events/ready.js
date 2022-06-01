@@ -1,6 +1,6 @@
 const Event = require('../Models/Event');
 
-module.exports = class extends Event {
+module.exports = class ReadyEvent extends Event {
 
 	constructor(...args) {
 		super(...args, {
