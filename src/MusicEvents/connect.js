@@ -1,4 +1,4 @@
-const BaseEvent = require('../Models/Event');
+const BaseEvent = require('@Models/Event');
 
 module.exports = class NodeConnectEvent extends BaseEvent {
   constructor () {

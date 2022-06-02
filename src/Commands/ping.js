@@ -1,4 +1,5 @@
-const Command = require('../Models/Command')
+const Command = require('@Models/Command')
+const { Message } = require('discord.js')
 
 module.exports = class PingCommand extends Command {
 
@@ -10,9 +11,13 @@ module.exports = class PingCommand extends Command {
 		})
 	}
 
+	/**
+    * 
+    * @param {Message} message 
+    */
+
 	async run(message) {
 		const msg = await message.channel.send('Pinging...')
-
 		const latency = msg.createdTimestamp - message.createdTimestamp
 		const choices = ['Is this really my ping?', 'Is this okay? I can\'t look!', 'I hope it isn\'t bad!']
 		const response = choices[Math.floor(Math.random() * choices.length)]

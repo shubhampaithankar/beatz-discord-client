@@ -1,10 +1,11 @@
 const fs = require('fs')
 const path = require('path')
+const mongoose = require('mongoose')
+const { Manager } = require('erela.js')
+const Spotify = require('better-erela.js-spotify').default
 
-const { MongoClient } = require('mongodb')
-
-const BaseEvent = require('../Models/Event')
-const BaseCommand = require('../Models/Command')
+const BaseEvent = require('@Models/Event')
+const BaseCommand = require('@Models/Command')
 
 module.exports = class Loader {
     constructor(client) {
@@ -12,11 +13,13 @@ module.exports = class Loader {
     }
 
     init = async () => {
+        await this.loadMongo()
+        await this.loadErela()
         await this.loadEvents('../Events')
         await this.loadCommands('../Commands')
         await this.loadMusicEvents('../MusicEvents')
-        await this.loadMongo()
     }
+
 
     loadCommands = async (dir) => {
         const filePath = path.join(__dirname, dir)
@@ -75,11 +78,28 @@ module.exports = class Loader {
         })
     }
 
+    loadErela = async () => {
+        this.client.music = new Manager({
+            nodes: [
+                {
+                  host: 'localhost',
+                  password: 'youshallnotpass',
+                  port: 2333,
+                }
+              ],
+            plugins: [
+                new Spotify(),
+            ],
+            send: (id, payload) => {
+                const guild = this.client.guilds.cache.get(id);
+                // NOTE: FOR ERIS YOU NEED JSON.stringify() THE PAYLOAD
+                if (guild) guild.shard.send(payload)
+            }
+        }) 
+    }
+
     loadMongo = async () => {
-        const client = new MongoClient(`mongodb+srv://shubham:${process.env.MONGO_PASSWORD}@cluster0.kdox5j6.mongodb.net/beatz-discord-bot`)
-        await client.connect()
-        console.log('Successfully connected to server')
-        const db = client.db(`beatz-discord-bot`)
-        this.client.db = db
+        const mongooseClient = await mongoose.connect(`mongodb+srv://shubham:${process.env.MONGO_PASSWORD}@cluster0.kdox5j6.mongodb.net/beatz-discord-bot`)
+        console.log(`Successfully connected to databse: ${mongooseClient.connection.db.namespace}`)
     }
 }

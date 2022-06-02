@@ -1,7 +1,6 @@
 const { Client, Intents, Collection } = require('discord.js')
-const { Manager } = require('erela.js')
-const mongodb = require('mongodb')
-const Loader = require('./Functions/Loader')
+
+const Loader = require('@Functions/Loader')
 
 const clientOptions = {
     intents: [
@@ -19,23 +18,6 @@ module.exports = class BeatzClient extends Client {
 
         this.aliases = new Collection()
         this.commands = new Collection()
-
-        this.prefix = '.'
-
-        this.music = new Manager({
-            nodes: [
-                {
-                  host: "localhost",
-                  password: "youshallnotpass",
-                  port: 2333,
-                }
-              ],
-            send: (id, payload) => {
-                const guild = this.client.guilds.cache.get(id);
-                // NOTE: FOR ERIS YOU NEED JSON.stringify() THE PAYLOAD
-                if (guild) guild.shard.send(payload)
-            }
-        }) 
     }
 
     initialize = (token) => {
