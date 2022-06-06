@@ -3,9 +3,9 @@ module.exports = class Event {
         this.client = client
         this.name = name 
         this.type = options.once ? 'once' : 'on'
-        this.emitter = (typeof options.emitter === 'string' ? this.client[options.emitter] : options.emitter) || this.client;
+        this.emitter = (typeof options.emitter === 'string' ? this.client[options.emitter] : options.emitter) || this.client
     }
     async run(...args) {
-		throw new Error(`The run method has not been implemented in ${this.name}`);
+		throw new Error(`The run method has not been implemented in ${this.name}`)
 	}
 }

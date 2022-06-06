@@ -5,6 +5,7 @@ const { Manager } = require('erela.js')
 const Spotify = require('better-erela.js-spotify').default
 
 const BaseEvent = require('@Models/Event')
+const BaseMusicEvent = require('@Models/MusicEvent')
 const BaseCommand = require('@Models/Command')
 
 module.exports = class Loader {
@@ -55,7 +56,7 @@ module.exports = class Loader {
                 if (Event.prototype instanceof BaseEvent) {
                     const event = new Event(this.client, name)
                     event.emitter[event.type](name, (...args) => event.run(...args))
-                  }
+                }
             }
         })
     }
@@ -67,12 +68,11 @@ module.exports = class Loader {
             const stat = await fs.lstatSync(path.join(filePath, musicFile))
             if (stat.isDirectory()) this.loadMusicEvents(path.join(dir, musicFile))
             if (musicFile.endsWith('.js')) {
-              const Event = require(path.join(filePath, musicFile))
-              if (Event.prototype instanceof BaseEvent) {
-                const event = new Event()
-                if (this.client.music) {
-                    this.client.music.on(event.name, event.run.bind(event, this.client))
-                }
+            const { name } = path.parse(musicFile)
+            const Event = require(path.join(filePath, musicFile))
+              if (Event.prototype instanceof BaseMusicEvent) {
+                const event = new Event(this.client, name)
+                event.emitter[event.type](name, (...args) => event.run(...args))
               }
             }
         })
@@ -88,18 +88,21 @@ module.exports = class Loader {
                 }
               ],
             plugins: [
-                new Spotify(),
+                // new Spotify(),
             ],
             send: (id, payload) => {
-                const guild = this.client.guilds.cache.get(id);
-                // NOTE: FOR ERIS YOU NEED JSON.stringify() THE PAYLOAD
+                const guild = this.client.guilds.cache.get(id)
                 if (guild) guild.shard.send(payload)
             }
         }) 
     }
 
     loadMongo = async () => {
-        const mongooseClient = await mongoose.connect(`mongodb+srv://shubham:${process.env.MONGO_PASSWORD}@cluster0.kdox5j6.mongodb.net/beatz-discord-bot`)
-        console.log(`Successfully connected to databse: ${mongooseClient.connection.db.namespace}`)
+        const URI = `mongodb+srv://shubham:${process.env.MONGO_PASSWORD}@cluster0.kdox5j6.mongodb.net/${process.env.DATABASE_NAME}`
+        const mongooseClient = await mongoose.connect(URI)
+        mongooseClient ? (
+            this.client.db = mongooseClient.connection.db,
+            console.log(`Successfully connected to database: ${this.client.db.namespace}`)
+        ): null
     }
 }

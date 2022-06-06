@@ -1,7 +1,6 @@
 const Event = require('@Models/Event')
 const { Message } = require('discord.js')
 
-const { GuildModel } = require('@Database/models')
 const guildDB = require('@Database/Functions/guildDB')
 
 module.exports = class MessageCreateEvent extends Event {
@@ -16,11 +15,12 @@ module.exports = class MessageCreateEvent extends Event {
 
 		if (!message.guild || message.author.bot) return
 
-		let { prefix } = await GuildModel.findOne({ id: message.guild.id })
-		if (!prefix) {
-			let createdGuild = await guildDB(message.guild, true)
-			prefix = createdGuild.prefix
+		let currentGuild = await this.client.db.collection('guilds').findOne({ id: message.guild.id })
+		if (!currentGuild) {
+			currentGuild = await guildDB(message.guild, true)
 		}
+
+		let { prefix } = currentGuild
 
 		if (message.content.match(mentionRegex)) {
 			return message.channel.send(`Prefix for **${message.guild.name}** is \`${prefix}\``)

@@ -1,6 +1,6 @@
 const { Client, Intents, Collection } = require('discord.js')
 
-const Loader = require('@Functions/Loader')
+const { Loader, Music, Utils } = require('@Functions/index')
 
 const clientOptions = {
     intents: [
