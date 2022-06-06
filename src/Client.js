@@ -15,6 +15,7 @@ module.exports = class BeatzClient extends Client {
         super(clientOptions)
         //functions
         this.loader = new Loader(this)
+        this.utils = new Utils(this)
 
         this.aliases = new Collection()
         this.commands = new Collection()

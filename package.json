@@ -16,6 +16,7 @@
     "erela.js": "^2.3.3",
     "lodash": "^4.17.21",
     "module-alias": "^2.2.2",
+    "moment": "^2.29.3",
     "mongoose": "^6.3.5"
   },
   "_moduleAliases": {
