@@ -33,10 +33,10 @@ module.exports = class Loader {
                 const Command = require(path.join(filePath, cmdFile))
                 if (Command.prototype instanceof BaseCommand) {
                     const command = new Command(this.client, name)
-                    this.client.commands.set(command.name, command)
+                    this.client.commands.set(command.name.toLowerCase(), command)
                     if (command.aliases.length) {
                         command.aliases.forEach(alias => {
-                            this.client.aliases.set(alias, command.name)
+                            this.client.aliases.set(alias, command.name.toLowerCase())
                         })
                     }
                 }
@@ -88,7 +88,7 @@ module.exports = class Loader {
                 }
               ],
             plugins: [
-                // new Spotify(),
+                new Spotify(),
             ],
             send: (id, payload) => {
                 const guild = this.client.guilds.cache.get(id)

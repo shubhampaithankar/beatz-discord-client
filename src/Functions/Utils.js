@@ -20,7 +20,15 @@ module.exports = class Utils {
      */
     deleteMsg = (message, time) => {
         try { 
-            return setTimeout(async () => message ? await message.delete() : null, 1000 * time)
+            return setTimeout(async () => {
+                if (message) {
+                    const channel = await this.client.channels.fetch(message.channel.id)
+                    if (channel) {
+                        const msg = await channel.messages.cache.get(message.id)
+                        msg ? await msg.delete() : null
+                    }
+                }
+            }, 1000 * time)
         } catch (error) {
             return
         }
@@ -54,23 +62,25 @@ module.exports = class Utils {
      */
      getMusicPlayer = (message, voiceChannel, create) => {
         let player = this.client.music.get(message.guild.id)
-        if (create && !player) {
-            this.client.music.create({
-                guild: message.guid.id,
-                voiceChannel: voiceChannel.id,
-                textChannel: message.channel.id
-            })
+        if (!player) {
+            if (create) {
+                player = this.client.music.create({
+                    guild: message.guild.id,
+                    voiceChannel: voiceChannel.id,
+                    textChannel: message.channel.id
+                })
+            }
         }
         return player
     }
 
     //Misc Functions 
     convertMstoMinutes = (ms) => {
-        return ms && !isNaN(ms) ? moment.duration(ms).asMinutes() : null
+        return ms && !isNaN(ms) ? moment.duration(ms).asMinutes().toFixed(2) : null
     }
 
-    truncateString = (s) => {
-        return s ? truncate(s, { length: 30 }) : null
+    truncateString = (s, length) => {
+        return s ? truncate(s, { length }) : null
     }
 
 }

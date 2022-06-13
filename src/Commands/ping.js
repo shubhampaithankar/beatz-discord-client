@@ -5,6 +5,7 @@ module.exports = class PingCommand extends Command {
 
 	constructor(...args) {
 		super(...args, {
+			name: 'Ping',
 			aliases: ['pong'],
 			description: 'This provides the ping of the bot',
 			module: 'Utilities'
@@ -23,6 +24,7 @@ module.exports = class PingCommand extends Command {
 		const response = choices[Math.floor(Math.random() * choices.length)]
 
 		msg.edit(`${response} - Bot Latency: \`${latency}ms\`, API Latency: \`${Math.round(this.client.ws.ping)}ms\``)
+		this.client.utils.deleteMsg(msg, 15)
 	}
 
 }
