@@ -25,8 +25,8 @@ module.exports = class BeatzClient extends Client {
         this.cooldowns = new Collection()
     }
 
-    initialize = (token) => {
+    initialize = async (token) => {
         super.login(token)
-        this.loader.init()
+        await this.loader.init()
     }
 }
