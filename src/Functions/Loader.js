@@ -31,13 +31,14 @@ module.exports = class Loader {
             if (stat.isDirectory()) this.loadCommands(path.join(dir, cmdFile))
             if (cmdFile.endsWith('.js')) {
                 const { name } = path.parse(cmdFile)
+
                 const Command = require(path.join(filePath, cmdFile))
                 if (Command.prototype instanceof BaseCommand) {
                     const command = new Command(this.client, name)
-                    this.client.commands.set(command.name.toLowerCase(), command)
+                    this.client.commands.set(name.toLowerCase(), command)
                     if (command.aliases.length) {
                         command.aliases.forEach(alias => {
-                            this.client.aliases.set(alias, command.name.toLowerCase())
+                            this.client.aliases.set(alias, name.toLowerCase())
                         })
                     }
                 }

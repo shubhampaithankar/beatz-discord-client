@@ -15,7 +15,7 @@ module.exports = class MessageCreateEvent extends Event {
 
 		let currentGuild = await this.client.db.collection('guilds').findOne({ id: message.guild.id })
 		if (!currentGuild) {
-			currentGuild = await await this.client.utils.guildDB(message.guild, true)
+			currentGuild = await this.client.utils.guildDB(message.guild, true)
 		}
 
 		let { prefix } = currentGuild
@@ -51,6 +51,17 @@ module.exports = class MessageCreateEvent extends Event {
 					msg = await message.channel.send(`Please wait for **${timeLeft.toFixed(1)} second(s) for cooldowns!**`)
 					return this.client.utils.deleteMsg(msg, 3)
 				}
+			}
+
+			switch (command.module) {
+				case 'Management': {
+					if (!message.member.permissions.has('MANAGE_GUILD')) {
+						msg = await message.channel.send(`You dont have permission to use this command: \`MANAGE_GUILD\``)
+						return this.client.utils.deleteMsg(msg, 10)
+					}
+				}
+				case 'Music': {
+				}				
 			}
 
 			command.run(message, args)
