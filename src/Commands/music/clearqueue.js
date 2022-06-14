@@ -1,13 +1,13 @@
 const Command = require('@Models/Command')
 const { Message } = require('discord.js')
 
-module.exports = class SkipCommand extends Command {
+module.exports = class ClearQueueCommand extends Command {
 
 	constructor(...args) {
 		super(...args, {
-      name: 'Skip',
-			aliases: ['s', 'next'],
-			description: 'Skips current track',
+      name: 'Clear',
+      aliases: ['cq'],
+			description: 'Clears the queue',
 			module: 'Music'
 		})
 	}
@@ -16,7 +16,6 @@ module.exports = class SkipCommand extends Command {
     * 
     * @param {Message} message 
     */
-
 	async run(message, args) {
 
     let msg
@@ -34,15 +33,14 @@ module.exports = class SkipCommand extends Command {
     }
 
     if (player.state === 'CONNECTED') {
+      
       if (player.voiceChannel !== channel.id) {
         msg = await message.channel.send(`You're not in the same voice channel`)
         return this.client.utils.deleteMsg(msg, 5)
       }
-      if (!player.queue.current) {
-        msg = await message.channel.send("There is no music playing")
-        return this.client.utils.deleteMsg(msg, 5)
-      }
-      player.stop()
+
+      player.queue.clear()
+      msg = await message.channel.send(`Cleared queue`)
       return this.client.utils.deleteMsg(msg, 5)
     }
 	}

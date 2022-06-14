@@ -9,7 +9,11 @@ module.exports = class QueueEndEvent extends MusicEvent {
      * @param {Track} track
      */
   async run (player, track) {
-   // const channel = this.client.channels.cache.get(player.textChannel)
-   return player ? player.destroy() : null
-  }
+      setTimeout(() => {
+         let p = this.client.music.get(player.guild)
+         if (p) {
+            !p.queue.current ? p.destroy() : null
+         }
+      }, 60e3)
+   }
 }

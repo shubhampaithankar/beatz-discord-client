@@ -2,6 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const mongoose = require('mongoose')
 const { Manager } = require('erela.js')
+const { Collection } = require('discord.js')
 const Spotify = require('better-erela.js-spotify').default
 
 const BaseEvent = require('@Models/Event')
@@ -94,7 +95,9 @@ module.exports = class Loader {
                 const guild = this.client.guilds.cache.get(id)
                 if (guild) guild.shard.send(payload)
             }
-        }) 
+        })
+
+        this.client.music.messages = new Collection()
     }
 
     loadMongo = async () => {

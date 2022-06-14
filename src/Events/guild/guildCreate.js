@@ -1,8 +1,6 @@
 const Event = require('@Models/Event')
 const { Guild } = require('discord.js')
 
-const guildDB = require('@Database/Functions/guildDB')
-
 module.exports = class GuildCreateEvent extends Event {
 
         /**
@@ -11,6 +9,6 @@ module.exports = class GuildCreateEvent extends Event {
          */
 
         run = async (guild) => {
-                let newGuild = await guildDB(guild, true)
+                let newGuild = await this.client.utils.guildDB(guild, true)
         }
 }

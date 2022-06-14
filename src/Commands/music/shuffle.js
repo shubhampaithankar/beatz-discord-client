@@ -1,13 +1,13 @@
 const Command = require('@Models/Command')
 const { Message } = require('discord.js')
+const { Queue } = require('erela.js')
 
-module.exports = class SkipCommand extends Command {
+module.exports = class ShuffleCommand extends Command {
 
 	constructor(...args) {
 		super(...args, {
-      name: 'Skip',
-			aliases: ['s', 'next'],
-			description: 'Skips current track',
+      name: 'Shuffle',
+			description: 'Shuffles current queue',
 			module: 'Music'
 		})
 	}
@@ -42,8 +42,11 @@ module.exports = class SkipCommand extends Command {
         msg = await message.channel.send("There is no music playing")
         return this.client.utils.deleteMsg(msg, 5)
       }
-      player.stop()
-      return this.client.utils.deleteMsg(msg, 5)
+
+      const { queue } = player
+      if (queue && queue.size > 1) queue.shuffle()
+      msg = await message.channel.send(`Shuffled the queue`)
+      return this.client.utils.deleteMsg(msg, 10)
     }
 	}
 }

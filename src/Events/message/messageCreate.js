@@ -1,8 +1,6 @@
 const Event = require('@Models/Event')
 const { Message, Collection } = require('discord.js')
 
-const guildDB = require('@Database/Functions/guildDB')
-
 module.exports = class MessageCreateEvent extends Event {
 
 	/**
@@ -17,7 +15,7 @@ module.exports = class MessageCreateEvent extends Event {
 
 		let currentGuild = await this.client.db.collection('guilds').findOne({ id: message.guild.id })
 		if (!currentGuild) {
-			currentGuild = await guildDB(message.guild, true)
+			currentGuild = await await this.client.utils.guildDB(message.guild, true)
 		}
 
 		let { prefix } = currentGuild

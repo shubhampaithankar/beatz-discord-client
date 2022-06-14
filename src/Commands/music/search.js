@@ -45,7 +45,7 @@ module.exports = class SearchCommand extends Command {
       let res;
 
       try {
-        res = await player.search(search, message.author)
+        res = await player.search(search, message.author.id)
         if (res.loadType === 'LOAD_FAILED') {
           if (!player.queue.current) player.destroy()
           throw res.exception

@@ -1,13 +1,13 @@
 const Command = require('@Models/Command')
 const { Message } = require('discord.js')
+const { Queue } = require('erela.js')
 
-module.exports = class SkipCommand extends Command {
+module.exports = class RemoveCommand extends Command {
 
 	constructor(...args) {
 		super(...args, {
-      name: 'Skip',
-			aliases: ['s', 'next'],
-			description: 'Skips current track',
+      name: 'Remove',
+			description: 'Removes a track from queue',
 			module: 'Music'
 		})
 	}
@@ -34,16 +34,24 @@ module.exports = class SkipCommand extends Command {
     }
 
     if (player.state === 'CONNECTED') {
+
       if (player.voiceChannel !== channel.id) {
         msg = await message.channel.send(`You're not in the same voice channel`)
         return this.client.utils.deleteMsg(msg, 5)
       }
-      if (!player.queue.current) {
-        msg = await message.channel.send("There is no music playing")
+      
+      const { queue } = player
+      
+      if (!args.length || args.length > 1 || args[0] > queue.size || args[0] < 1 || isNaN(Number(args[0]))) {
+        msg = await message.channel.send(`You need to enter a number between 1 to ${queue.size + 1}`)
         return this.client.utils.deleteMsg(msg, 5)
       }
-      player.stop()
-      return this.client.utils.deleteMsg(msg, 5)
+
+      if (queue && queue.size > 1) {
+        const track = queue.remove(Number(args[0]) - 1)
+        msg = await message.channel.send(`Removed \`${track[0].title}\` from queue`)
+        return this.client.utils.deleteMsg(msg, 10)
+      }
     }
 	}
 }

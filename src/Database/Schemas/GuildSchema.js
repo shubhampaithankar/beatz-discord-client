@@ -33,4 +33,22 @@ module.exports = new Schema({
         required: true,
         unique: true
     },
+    modules: {
+        type: Array,
+        required: false,
+        unique: false,
+        module: {
+            type: Object,
+            name: {
+                type: String,
+                required: false,
+                unique: false
+            },
+            enabled: {
+                type: Boolean,
+                required: false,
+                unique: false
+            }
+        }
+    }
 })

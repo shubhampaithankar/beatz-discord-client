@@ -1,6 +1,9 @@
 const { Client, Message, Guild, MessageEmbed } = require("discord.js")
-const { truncate } = require("lodash")
+const { truncate, uniq } = require("lodash")
 const moment = require("moment")
+
+const { GuildModel } = require('@Database/models')
+
 
 module.exports = class Utils {
     /**
@@ -34,12 +37,12 @@ module.exports = class Utils {
         }
     }
     
-    createEmbedMessage = (embedObject) => {
+    createMessageEmbed = (embedObject) => {
         const { title, url, description, image, fields, thumbnail, footer, timestamp } = embedObject
         
         let embed = new MessageEmbed()
-            .setAuthor({ iconURL: this.client.user.avatarURL, name: this.client.user.username })
-            .setColor(`#484575`)
+            // .setAuthor({ iconURL: this.client.user.avatarURL, name: this.client.user.username })
+            // .setColor(`#484575`)
 
         title ? embed.setTitle(title) : null
         title && url ? embed.setURL(url) : null
@@ -48,7 +51,7 @@ module.exports = class Utils {
         thumbnail ? embed.setThumbnail(thumbnail) : null
         footer ? embed.setFooter(footer) : null
         timestamp ? embed.setTimestamp(new Date().toDateString()) : null
-        fields.length ? fields.forEach(({ name, value, inline }) => embed.addField(name, value, inline)) : null
+        fields ? fields.forEach(({ name, value, inline }) => embed.addField(name, value, inline)) : null
     
         return embed
     }
@@ -62,16 +65,41 @@ module.exports = class Utils {
      */
      getMusicPlayer = (message, voiceChannel, create) => {
         let player = this.client.music.get(message.guild.id)
-        if (!player) {
-            if (create) {
-                player = this.client.music.create({
-                    guild: message.guild.id,
-                    voiceChannel: voiceChannel.id,
-                    textChannel: message.channel.id
-                })
-            }
+        if (create) {
+            player = this.client.music.create({
+                guild: message.guild.id,
+                voiceChannel: voiceChannel.id,
+                textChannel: message.channel.id
+            })
         }
         return player
+    }
+
+    //MongoDB Functions
+    /**
+     * 
+     * @param {Guild} guild 
+     */
+    guildDB = async (guild, joined) => {
+        try {    
+            const { id, name, ownerId, available, joinedAt } = guild
+            const newGuild = await GuildModel.findOneAndUpdate({ id }, {
+                id,
+                name,
+                ownerId, 
+                joinedAt,
+                available, 
+                prefix: '.',
+                isPresent: joined ? true : false
+            }, { 
+                upsert: true, 
+                new: true 
+            })
+            return newGuild
+        } catch (error) {
+            console.log(error)
+            return null
+        }
     }
 
     //Misc Functions 
@@ -81,6 +109,10 @@ module.exports = class Utils {
 
     truncateString = (s, length) => {
         return s ? truncate(s, { length }) : null
+    }
+
+    removeDupes = arr => {
+        return Array.isArray(arr) ? uniq(arr) : null
     }
 
 }
